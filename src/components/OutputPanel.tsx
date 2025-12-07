@@ -39,7 +39,7 @@ const OutputPanel = ({ output, onClear }: OutputPanelProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-output-bg rounded-lg border border-border/30 overflow-hidden">
+    <div className="h-full flex flex-col bg-output-bg rounded-lg border border-border/30 overflow-hidden" data-testid="output-panel">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/30 bg-toolbar-bg">
         <div className="flex items-center gap-2">
@@ -48,6 +48,7 @@ const OutputPanel = ({ output, onClear }: OutputPanelProps) => {
         </div>
         <button
           onClick={onClear}
+          data-testid="clear-output"
           className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-smooth"
           title="Clear console"
         >
