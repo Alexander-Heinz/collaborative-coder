@@ -39,7 +39,7 @@ const Toolbar = ({
         <div className="h-6 w-px bg-border/50 hidden sm:block" />
 
         {/* Language Selector */}
-        <div className="relative group">
+        <div className="relative group" data-testid="language-selector">
           <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-smooth">
             <span className="text-xs font-bold text-primary px-1.5 py-0.5 bg-primary/20 rounded">
               {currentLanguage.icon}
@@ -75,6 +75,7 @@ const Toolbar = ({
         <button
           onClick={onRun}
           disabled={isRunning}
+          data-testid="run-button"
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-smooth shadow-lg shadow-primary/20"
         >
           <Play className={`w-4 h-4 ${isRunning ? "animate-pulse" : ""}`} />
@@ -91,7 +92,7 @@ const Toolbar = ({
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-success rounded-full animate-pulse-glow" />
           </div>
           <span className="text-sm text-muted-foreground">
-            <span className="text-foreground font-medium">{connectedUsers}</span>
+            <span className="text-foreground font-medium" data-testid="user-count">{connectedUsers}</span>
             <span className="hidden sm:inline"> online</span>
           </span>
         </div>
@@ -99,6 +100,7 @@ const Toolbar = ({
         {/* Share Button */}
         <button
           onClick={onShare}
+          data-testid="share-button"
           className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-secondary hover:border-primary/50 transition-smooth"
         >
           <Share2 className="w-4 h-4 text-muted-foreground" />
