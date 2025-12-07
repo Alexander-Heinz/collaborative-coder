@@ -25,7 +25,8 @@ test.describe('CodeSync UI Tests', () => {
 
   test('Homepage loads correctly', async ({ page }) => {
     // Check main elements are present
-    await expect(page.locator('text=CodeSync')).toBeVisible();
+    // Use more specific selector for the logo/title
+    await expect(page.locator('.font-semibold.text-foreground', { hasText: 'CodeSync' })).toBeVisible();
     await expect(page.locator('[data-testid="run-button"]')).toBeVisible();
     await expect(page.locator('[data-testid="share-button"]')).toBeVisible();
     
@@ -57,15 +58,18 @@ test.describe('CodeSync UI Tests', () => {
     await expect(output).toBeVisible();
   });
 
-  test('Share button copies link', async ({ page }) => {
-    // Grant clipboard permissions
-    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  test('Share button copies link', async ({ page, browserName }) => {
+    // Grant clipboard permissions if supported
+    if (browserName === 'chromium') {
+      await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    }
     
     // Click share
     await page.click('[data-testid="share-button"]');
     
-    // Should show toast notification
-    await expect(page.locator('text=Link copied')).toBeVisible({ timeout: 5000 });
+    // Should show toast notification - use specific text match
+    // The toast might contain "Link copied!" or similar
+    await expect(page.getByText('Link copied!', { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
   test('Output panel can be cleared', async ({ page }) => {

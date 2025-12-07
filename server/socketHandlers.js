@@ -58,8 +58,6 @@ function setupSocketHandlers(io) {
     // Handle code changes
     socket.on('code-change', ({ roomId, code, language }) => {
       try {
-        console.log(`[Socket] code-change: room=${roomId}, language=${language}, length=${code?.length}`);
-        
         // Update room state
         const room = updateCode(roomId, code, language);
         

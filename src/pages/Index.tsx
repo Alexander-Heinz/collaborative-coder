@@ -1,91 +1,44 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import CodeEditor from "@/components/CodeEditor";
 import OutputPanel, { OutputLine } from "@/components/OutputPanel";
 import Toolbar from "@/components/Toolbar";
 import { toast } from "@/hooks/use-toast";
-
-const defaultCode: Record<string, string> = {
-  javascript: `// Welcome to CodeSync! 🚀
-// Start coding and see the magic happen
-
-function fibonacci(n) {
-  if (n <= 1) return n;
-  return fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-console.log("Fibonacci sequence:");
-for (let i = 0; i < 10; i++) {
-  console.log(\`F(\${i}) = \${fibonacci(i)}\`);
-}
-
-// Try editing this code!
-console.log("\\nHello from CodeSync! 👋");`,
-  python: `# Welcome to CodeSync! 🚀
-# Python syntax highlighting demo
-
-def fibonacci(n):
-    if n <= 1:
-        return n
-    return fibonacci(n - 1) + fibonacci(n - 2)
-
-print("Fibonacci sequence:")
-for i in range(10):
-    print(f"F({i}) = {fibonacci(i)}")
-
-# Try editing this code!
-print("\\nHello from CodeSync! 👋")`,
-  html: `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>CodeSync Demo</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      color: #e8e8e8;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      background: rgba(255,255,255,0.1);
-      padding: 2rem;
-      border-radius: 1rem;
-      backdrop-filter: blur(10px);
-    }
-    h1 {
-      color: #00d9ff;
-      margin: 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Hello, CodeSync! 🚀</h1>
-    <p>Edit this HTML and see changes</p>
-  </div>
-</body>
-</html>`,
-};
+import { useSocket } from "@/hooks/useSocket";
 
 const Index = () => {
-  const [language, setLanguage] = useState("javascript");
-  const [code, setCode] = useState(defaultCode.javascript);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const roomId = searchParams.get("room") || "default-room";
+  
+  const { 
+    isConnected, 
+    code, 
+    language, 
+    userCount, 
+    updateCode 
+  } = useSocket(roomId);
+
   const [output, setOutput] = useState<OutputLine[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [connectedUsers] = useState(3); // Mock value
+
+  // Update URL with room ID if not present
+  useEffect(() => {
+    if (!searchParams.get("room")) {
+      setSearchParams({ room: "default-room" });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleLanguageChange = useCallback((lang: string) => {
-    setLanguage(lang);
-    setCode(defaultCode[lang] || "");
-    setOutput([]);
-  }, []);
+    // For now, we just update the code with a comment about the language change
+    // In a real app, we might want to preserve code or switch templates
+    updateCode(code, lang);
+  }, [code, updateCode]);
 
   const handleCodeChange = useCallback((value: string | undefined) => {
-    setCode(value || "");
-  }, []);
+    if (value !== undefined) {
+      updateCode(value);
+    }
+  }, [updateCode]);
 
   const handleRun = useCallback(() => {
     setIsRunning(true);
@@ -93,50 +46,44 @@ const Index = () => {
       { type: "info", content: `Running ${language}...`, timestamp: new Date() },
     ]);
 
-    // Simulate execution with mock output
+    // Simulate execution with mock output (since we don't have a real execution engine yet)
     setTimeout(() => {
       const mockOutputs: OutputLine[] = [
         { type: "info", content: `Running ${language}...`, timestamp: new Date() },
       ];
 
       if (language === "javascript") {
-        mockOutputs.push(
-          { type: "log", content: "Fibonacci sequence:", timestamp: new Date() },
-          { type: "log", content: "F(0) = 0", timestamp: new Date() },
-          { type: "log", content: "F(1) = 1", timestamp: new Date() },
-          { type: "log", content: "F(2) = 1", timestamp: new Date() },
-          { type: "log", content: "F(3) = 2", timestamp: new Date() },
-          { type: "log", content: "F(4) = 3", timestamp: new Date() },
-          { type: "log", content: "F(5) = 5", timestamp: new Date() },
-          { type: "log", content: "F(6) = 8", timestamp: new Date() },
-          { type: "log", content: "F(7) = 13", timestamp: new Date() },
-          { type: "log", content: "F(8) = 21", timestamp: new Date() },
-          { type: "log", content: "F(9) = 34", timestamp: new Date() },
-          { type: "log", content: "", timestamp: new Date() },
-          { type: "log", content: "Hello from CodeSync! 👋", timestamp: new Date() },
-          { type: "result", content: "Execution completed in 12ms", timestamp: new Date() }
-        );
-      } else if (language === "python") {
-        mockOutputs.push(
-          { type: "log", content: "Fibonacci sequence:", timestamp: new Date() },
-          { type: "log", content: "F(0) = 0", timestamp: new Date() },
-          { type: "log", content: "F(1) = 1", timestamp: new Date() },
-          { type: "log", content: "F(2) = 1", timestamp: new Date() },
-          { type: "log", content: "...", timestamp: new Date() },
-          { type: "log", content: "Hello from CodeSync! 👋", timestamp: new Date() },
-          { type: "result", content: "Execution completed in 45ms", timestamp: new Date() }
-        );
+        try {
+          // dangerous but okay for a demo/test
+          // eslint-disable-next-line no-eval
+          const result = eval(code); 
+          console.log = (...args) => {
+            mockOutputs.push({ type: "log", content: args.join(" "), timestamp: new Date() });
+          };
+          
+          // Capture console.log from eval
+          // Note: This is a very basic simulation and won't capture async logs correctly
+          // In a real app, this would be handled by the backend
+          
+          mockOutputs.push(
+            { type: "result", content: `Result: ${result}`, timestamp: new Date() }
+          );
+        } catch (error) {
+           mockOutputs.push(
+            { type: "error", content: String(error), timestamp: new Date() }
+          );
+        }
       } else {
         mockOutputs.push(
-          { type: "info", content: "HTML rendered successfully", timestamp: new Date() },
-          { type: "result", content: "Preview ready", timestamp: new Date() }
+          { type: "info", content: "Execution simulation only available for JavaScript in this demo", timestamp: new Date() },
+          { type: "result", content: "Execution completed", timestamp: new Date() }
         );
       }
 
       setOutput(mockOutputs);
       setIsRunning(false);
     }, 800);
-  }, [language]);
+  }, [language, code]);
 
   const handleShare = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
@@ -158,7 +105,7 @@ const Index = () => {
         onLanguageChange={handleLanguageChange}
         onRun={handleRun}
         onShare={handleShare}
-        connectedUsers={connectedUsers}
+        connectedUsers={userCount}
         isRunning={isRunning}
       />
 
@@ -188,8 +135,8 @@ const Index = () => {
         <div className="flex items-center gap-4 text-muted-foreground">
           <span>UTF-8</span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 bg-success rounded-full animate-pulse-glow" />
-            Connected
+            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-success animate-pulse-glow' : 'bg-destructive'}`} />
+            {isConnected ? 'Connected' : 'Disconnected'}
           </span>
         </div>
       </div>

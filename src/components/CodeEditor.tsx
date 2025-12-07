@@ -23,6 +23,10 @@ const CodeEditor = ({ language, code, onChange }: CodeEditorProps) => {
         language={getMonacoLanguage(language)}
         value={code}
         onChange={onChange}
+        onMount={(editor, monaco) => {
+          // Expose monaco to window for E2E testing
+          (window as any).monaco = monaco;
+        }}
         theme="vs-dark"
         options={{
           fontSize: 14,

@@ -1,11 +1,11 @@
 const express = require('express');
-const { createServer } = require('http');
+const http = require('http'); // Changed from { createServer }
 const { Server } = require('socket.io');
 const cors = require('cors');
 const { setupSocketHandlers } = require('./socketHandlers');
 
 const app = express();
-const httpServer = createServer(app);
+const server = http.createServer(app); // Changed from httpServer = createServer(app)
 
 // CORS configuration
 app.use(cors({
@@ -17,11 +17,10 @@ app.use(cors({
 app.use(express.json());
 
 // Socket.io server
-const io = new Server(httpServer, {
+const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'],
-    methods: ['GET', 'POST'],
-    credentials: true
+    origin: "*", // Allow all origins for dev/test
+    methods: ["GET", "POST"]
   }
 });
 
@@ -42,7 +41,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 
-httpServer.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`[Server] CodeSync backend running on port ${PORT}`);
   console.log(`[Server] Health check: http://localhost:${PORT}/api/health`);
 });
