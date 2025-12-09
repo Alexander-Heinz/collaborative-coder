@@ -1,7 +1,7 @@
 import { Terminal, Trash2 } from "lucide-react";
 
 interface OutputLine {
-  type: "log" | "error" | "info" | "result";
+  type: "log" | "error" | "warn" | "info" | "result";
   content: string;
   timestamp: Date;
 }
@@ -16,6 +16,8 @@ const OutputPanel = ({ output, onClear }: OutputPanelProps) => {
     switch (type) {
       case "error":
         return "text-destructive";
+      case "warn":
+        return "text-yellow-500";
       case "info":
         return "text-primary";
       case "result":
@@ -29,6 +31,8 @@ const OutputPanel = ({ output, onClear }: OutputPanelProps) => {
     switch (type) {
       case "error":
         return "✕";
+      case "warn":
+        return "⚠";
       case "info":
         return "ℹ";
       case "result":

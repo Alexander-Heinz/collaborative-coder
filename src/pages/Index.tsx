@@ -5,6 +5,7 @@ import OutputPanel, { OutputLine } from "@/components/OutputPanel";
 import Toolbar from "@/components/Toolbar";
 import { toast } from "@/hooks/use-toast";
 import { useSocket } from "@/hooks/useSocket";
+import { useCodeExecution } from "@/hooks/useCodeExecution";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,6 +18,8 @@ const Index = () => {
     userCount, 
     updateCode 
   } = useSocket(roomId);
+
+  const { executeCode, isLoading: isExecuting } = useCodeExecution();
 
   const [output, setOutput] = useState<OutputLine[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -40,50 +43,31 @@ const Index = () => {
     }
   }, [updateCode]);
 
-  const handleRun = useCallback(() => {
+  const handleRun = useCallback(async () => {
     setIsRunning(true);
     setOutput([
       { type: "info", content: `Running ${language}...`, timestamp: new Date() },
     ]);
 
-    // Simulate execution with mock output (since we don't have a real execution engine yet)
-    setTimeout(() => {
-      const mockOutputs: OutputLine[] = [
+    try {
+      const result = await executeCode(code, language);
+      
+      // Add initial info message plus execution outputs
+      const finalOutput: OutputLine[] = [
         { type: "info", content: `Running ${language}...`, timestamp: new Date() },
+        ...result.outputs,
       ];
-
-      if (language === "javascript") {
-        try {
-          // dangerous but okay for a demo/test
-          // eslint-disable-next-line no-eval
-          const result = eval(code); 
-          console.log = (...args) => {
-            mockOutputs.push({ type: "log", content: args.join(" "), timestamp: new Date() });
-          };
-          
-          // Capture console.log from eval
-          // Note: This is a very basic simulation and won't capture async logs correctly
-          // In a real app, this would be handled by the backend
-          
-          mockOutputs.push(
-            { type: "result", content: `Result: ${result}`, timestamp: new Date() }
-          );
-        } catch (error) {
-           mockOutputs.push(
-            { type: "error", content: String(error), timestamp: new Date() }
-          );
-        }
-      } else {
-        mockOutputs.push(
-          { type: "info", content: "Execution simulation only available for JavaScript in this demo", timestamp: new Date() },
-          { type: "result", content: "Execution completed", timestamp: new Date() }
-        );
-      }
-
-      setOutput(mockOutputs);
+      
+      setOutput(finalOutput);
+    } catch (error) {
+      setOutput([
+        { type: "info", content: `Running ${language}...`, timestamp: new Date() },
+        { type: "error", content: String(error), timestamp: new Date() },
+      ]);
+    } finally {
       setIsRunning(false);
-    }, 800);
-  }, [language, code]);
+    }
+  }, [language, code, executeCode]);
 
   const handleShare = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);

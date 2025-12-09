@@ -1,0 +1,29 @@
+services:
+  # Main application - combines frontend + backend
+  - type: web
+    name: collaborative-coder
+    runtime: docker
+    plan: free
+    region: oregon  # Choose: oregon, frankfurt, singapore
+    branch: main
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    # Health check configuration
+    healthCheckPath: /api/health
+    
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+    
+    # Build configuration
+    buildFilter:
+      paths:
+        - server/**
+        - src/**
+        - Dockerfile
+        - package.json

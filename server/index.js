@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http'); // Changed from { createServer }
 const { Server } = require('socket.io');
 const cors = require('cors');
+const path = require('path');
 const { setupSocketHandlers } = require('./socketHandlers');
 
 const app = express();
@@ -32,6 +33,19 @@ app.get('/api/health', (req, res) => {
 
 // Setup socket handlers
 setupSocketHandlers(io);
+
+// Serve static files from the dist folder (frontend build) in production
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// SPA fallback - serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes or socket.io routes
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

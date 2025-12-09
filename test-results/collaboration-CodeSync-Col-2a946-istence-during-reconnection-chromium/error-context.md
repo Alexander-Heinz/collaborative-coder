@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list
+    - region "Notifications alt+T"
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]:
+            - img [ref=e8]
+            - generic [ref=e12]: CodeSync
+          - button "JS JavaScript" [ref=e15] [cursor=pointer]:
+            - generic [ref=e16]: JS
+            - generic [ref=e17]: JavaScript
+            - img [ref=e18]
+        - button "Run" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - generic [ref=e24]: Run
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - img [ref=e28]
+            - generic [ref=e34]: 1 online
+          - button "Share" [ref=e35] [cursor=pointer]:
+            - img [ref=e36]
+            - generic [ref=e42]: Share
+      - generic [ref=e43]:
+        - code [ref=e48]:
+          - generic [ref=e49]:
+            - textbox "Editor content" [ref=e50]
+            - textbox [ref=e51]
+            - generic [ref=e53]:
+              - generic [ref=e55]: "1"
+              - generic [ref=e58]: "2"
+            - generic [ref=e63]:
+              - generic [ref=e65]: // Welcome to CodeSync! 🚀
+              - generic [ref=e67]: console.log("Hello, World!");
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - img [ref=e73]
+              - generic [ref=e75]: Console
+            - button "Clear console" [ref=e76] [cursor=pointer]:
+              - img [ref=e77]
+          - paragraph [ref=e82]:
+            - text: Run your code to see output here
+            - text: Press Ctrl+Enter or click Run
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - generic [ref=e85]: Ln 1, Col 1
+          - generic [ref=e86]: Javascript
+        - generic [ref=e87]:
+          - generic [ref=e88]: UTF-8
+          - generic [ref=e89]: Connected
+  - generic [ref=e91]:
+    - alert
+    - alert
+```
