@@ -8,14 +8,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy all source files first (before installing dependencies)
+COPY . .
 
 # Install ALL dependencies (including devDependencies for build)
 RUN npm install
-
-# Copy source code
-COPY . .
 
 # Build the frontend
 RUN npm run build
