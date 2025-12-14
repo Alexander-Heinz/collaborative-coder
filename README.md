@@ -1,5 +1,7 @@
 # CodeSync - Collaborative Code Editor
 
+**[Live Demo on Render](https://collaborative-coder.onrender.com/)**
+
 **CodeSync** is a modern, real-time collaborative code editor designed for instant peer programming without the hassle of environment setup. Built for speed and simplicity, it allows developers to write, execute, and debug code together in the browser.
 
 ## Management Summary
