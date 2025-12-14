@@ -17,7 +17,7 @@ interface ClientToServerEvents {
   'code-change': (data: { roomId: string; code: string; language?: string }) => void;
 }
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
 
 export const useSocket = (roomId: string | null) => {
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
